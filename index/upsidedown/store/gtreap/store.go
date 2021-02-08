@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// 		http://www.apache.org/licenses/LICENSE-2.0
+//		http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"math/rand"
 
 	"github.com/blevesearch/bleve/v2/registry"
 	"github.com/blevesearch/upsidedown_store_api"
@@ -74,7 +75,10 @@ func (s *Store) Reader() (store.KVReader, error) {
 }
 
 func (s *Store) Writer() (store.KVWriter, error) {
-	return &Writer{s: s}, nil
+	return &Writer{
+		s: s,
+		prng: rand.New(rand.NewSource(rand.Int63())),
+	}, nil
 }
 
 func init() {

@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// 		http://www.apache.org/licenses/LICENSE-2.0
+//		http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,7 @@ import (
 
 type Writer struct {
 	s *Store
+	prng *rand.Rand
 }
 
 func (w *Writer) NewBatch() store.KVBatch {
@@ -55,12 +56,12 @@ func (w *Writer) ExecuteBatch(batch store.KVBatch) error {
 		if !fullMergeOk {
 			return fmt.Errorf("merge operator returned failure")
 		}
-		w.s.t = w.s.t.Upsert(&Item{k: kb, v: mergedVal}, rand.Int())
+		w.s.t = w.s.t.Upsert(&Item{k: kb, v: mergedVal}, w.prng.Int())
 	}
 
 	for _, op := range emulatedBatch.Ops {
 		if op.V != nil {
-			w.s.t = w.s.t.Upsert(&Item{k: op.K, v: op.V}, rand.Int())
+			w.s.t = w.s.t.Upsert(&Item{k: op.K, v: op.V}, w.prng.Int())
 		} else {
 			w.s.t = w.s.t.Delete(&Item{k: op.K})
 		}
